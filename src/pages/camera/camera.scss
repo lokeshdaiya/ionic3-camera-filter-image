@@ -1,0 +1,15 @@
+page-about {
+
+}
+
+.center {
+    text-align: center;
+}
+
+$filters:("opacity","grayscale");
+
+@each $filter in $filters {
+  @for $number from 1 to 100 {
+    .#{$filter}#{$number} { filter: #{$filter}('(#{$number}%)')  }
+  }
+}

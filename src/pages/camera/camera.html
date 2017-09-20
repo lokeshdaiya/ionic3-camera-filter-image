@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Camera
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <button ion-button full color="primary" (click)="getSnap()">Take Snap</button>
+    <button ion-button full  (click)="save()">Save</button>
+    <div class="center">
+    <img #imageElm [src]="image" *ngIf="image" id="im" />
+    <button (click)="addFilter()">Filter</button>
+    </div>
+    <ion-list  no-lines>
+    <div *ngFor="let filterProp of filters|keys">
+      <h3>{{filterProp.value.name | uppercase}}</h3>
+  <ion-range [min]="filterProp.value.min" [(ngModel)]="filterProp.value.value" [max]="filterProp.value.max" 
+      (ionChange)="applyFilterFromJs(filterProp.value,$event)">
+       <ion-label range-left>{{filterProp.value.min}}</ion-label>
+      <ion-label range-right>{{filterProp.value.max}}</ion-label>
+  </ion-range>
+</div>
+</ion-list>
+</ion-content>
