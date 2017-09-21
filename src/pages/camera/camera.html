@@ -10,8 +10,7 @@
     <button ion-button full color="primary" (click)="getSnap()">Take Snap</button>
     <button ion-button full  (click)="save()">Save</button>
     <div class="center">
-    <img #imageElm [src]="image" *ngIf="image" id="im" />
-    <button (click)="addFilter()">Filter</button>
+    <canvas id="canvas"></canvas>
     </div>
     <ion-list  no-lines>
     <div *ngFor="let filterProp of filters|keys">

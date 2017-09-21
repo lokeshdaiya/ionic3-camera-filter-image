@@ -1,18 +1,17 @@
-import { Component , ElementRef, ViewChild } from '@angular/core';
+import { Component , Inject , AfterViewInit } from '@angular/core';
+import { DOCUMENT } from '@angular/platform-browser';
 import { NavController } from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { AlertController } from 'ionic-angular';
 import { PhotoLibrary } from '@ionic-native/photo-library';
 
-declare var Caman:any;
-
 @Component({
   selector: 'page-camera',
   templateUrl: 'camera.html'
 })
-export class CameraPage {
-  @ViewChild('imageElm') elImg:ElementRef
-  image = 'assets/camera.jpg';
+export class CameraPage implements AfterViewInit {
+  image;
+  canvasContext;
   filter=1;
   filters = 
      {
@@ -31,9 +30,14 @@ export class CameraPage {
     allowEdit : true,
     mediaType: this.camera.MediaType.PICTURE
   }
-  constructor(public navCtrl: NavController, private camera: Camera, public alertCtrl: AlertController, public photoLibrary: PhotoLibrary) {}
-
-  
+  constructor(public navCtrl: NavController, private camera: Camera, public alertCtrl: AlertController, public photoLibrary: PhotoLibrary, @Inject(DOCUMENT)private document) {}
+    
+  ngAfterViewInit() {
+    this.image = new Image();
+    this.image.src = 'assets/camera.jpg';
+    this.canvasContext = this.getCanvas();
+    this.image.onload = () => this.canvasContext.drawImage(this.image, 0, 0,400,400);
+  }
   getSnap(){
     this.camera.getPicture(this.options).then((imageData) => {
     // imageData is either a base64 encoded string or a file URI
@@ -41,7 +45,7 @@ export class CameraPage {
     let base64Image = 'data:image/jpeg;base64,' + imageData;
     //console.log(imageData);
     // this.showAlert("",imageData);
-    this.image = base64Image;
+    this.image.src = base64Image;
     }, (err) => {
     // Handle error
     this.showAlert('Error','failed to click image');
@@ -80,25 +84,26 @@ applyFilterFromJs(filterProp,event){
      break;
  }
 
-  this.elImg.nativeElement.style.filter = `
+  this.canvasContext.filter = `
     blur(${this.filters.blur.value}${this.filters.blur.map})
     opacity(${this.filters.opacity.value}${this.filters.opacity.map})
     grayscale(${this.filters.grayscale.value}${this.filters.grayscale.map})
     brightness(${this.filters.brightness.value}${this.filters.brightness.map})
     sepia(${this.filters.sepia.value}${this.filters.sepia.map})
   `
+  this.canvasContext.drawImage(this.image, 0, 0,400,400);
+}
+
+getCanvas(){
+  let canvas =  this.document.getElementById('canvas');
+  let context = canvas.getContext('2d');
+  return context;
 }
 
 save(){
   const album = 'MyAppName';
-  this.photoLibrary.saveImage(this.image, album);
+  let image = this.canvasContext.toDataURL();
+  this.photoLibrary.saveImage(image, album);
 }
-
-addFilter(){
-     Caman("#im", function(){
-       this.sinCity();
-       this.render();
-     })
-  }
 
 }
